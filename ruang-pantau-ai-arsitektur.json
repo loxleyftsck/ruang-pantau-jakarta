@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Ruang Pantau — Arsitektur AI Ringan",
+    "output": "ruang-pantau-ai-arsitektur.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "current-app",
+        "label": "Aplikasi sekarang",
+        "focus": [
+          "catalog",
+          "static-server",
+          "dashboard",
+          "public-feed"
+        ],
+        "note": "Peta dan pemutar CCTV tetap berjalan sebagai aplikasi statis."
+      },
+      {
+        "id": "offline-ai",
+        "label": "Analisis video lokal",
+        "focus": [
+          "sample-video",
+          "nanodet-model",
+          "cv-worker",
+          "estimates",
+          "static-server",
+          "dashboard"
+        ],
+        "note": "Worker CPU membaca klip berizin dan menghasilkan agregat untuk peta."
+      },
+      {
+        "id": "resource-boundary",
+        "label": "Batas sumber daya",
+        "focus": [
+          "sample-video",
+          "nanodet-model",
+          "cv-worker",
+          "estimates"
+        ],
+        "note": "MVP memakai satu video lokal, model INT8, CPU, dan tanpa penyimpanan rekaman."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "sample-video",
+      "type": "external",
+      "label": "Video contoh berizin",
+      "sublabel": "MP4 lokal • input analisis",
+      "tag": "USULAN MVP",
+      "pos": [
+        40,
+        520
+      ],
+      "size": [
+        205,
+        82
+      ]
+    },
+    {
+      "id": "nanodet-model",
+      "type": "backend",
+      "label": "NanoDet-Plus",
+      "sublabel": "ONNX INT8 • 416×416",
+      "tag": "MODEL RINGAN",
+      "pos": [
+        250,
+        335
+      ],
+      "size": [
+        205,
+        82
+      ]
+    },
+    {
+      "id": "cv-worker",
+      "type": "backend",
+      "label": "Worker Computer Vision",
+      "sublabel": "Python • OpenCV DNN • CPU",
+      "tag": "USULAN MVP",
+      "pos": [
+        550,
+        335
+      ],
+      "size": [
+        225,
+        98
+      ]
+    },
+    {
+      "id": "estimates",
+      "type": "database",
+      "label": "traffic-estimates.json",
+      "sublabel": "Hitungan agregat + waktu",
+      "tag": "FILE LOKAL",
+      "pos": [
+        860,
+        335
+      ],
+      "size": [
+        225,
+        88
+      ]
+    },
+    {
+      "id": "catalog",
+      "type": "database",
+      "label": "cameras.json",
+      "sublabel": "Katalog kamera sekarang",
+      "tag": "SUDAH ADA",
+      "pos": [
+        540,
+        100
+      ],
+      "size": [
+        225,
+        82
+      ]
+    },
+    {
+      "id": "static-server",
+      "type": "backend",
+      "label": "Node static server",
+      "sublabel": "127.0.0.1:8000 • serve.js",
+      "tag": "SUDAH ADA",
+      "pos": [
+        860,
+        100
+      ],
+      "size": [
+        225,
+        88
+      ]
+    },
+    {
+      "id": "dashboard",
+      "type": "frontend",
+      "label": "Ruang Pantau",
+      "sublabel": "Peta • pemutar • panel estimasi",
+      "tag": "PETA SUDAH ADA",
+      "pos": [
+        1120,
+        100
+      ],
+      "size": [
+        225,
+        88
+      ]
+    },
+    {
+      "id": "public-feed",
+      "type": "external",
+      "label": "Feed Bali Tower",
+      "sublabel": "HLS pihak ketiga • playback",
+      "tag": "TIDAK DIANALISIS",
+      "pos": [
+        1120,
+        335
+      ],
+      "size": [
+        225,
+        88
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "video-to-worker",
+      "from": "sample-video",
+      "to": "cv-worker",
+      "label": "baca frame video lokal",
+      "variant": "emphasis"
+    },
+    {
+      "id": "model-to-worker",
+      "from": "nanodet-model",
+      "to": "cv-worker",
+      "label": "inferensi deteksi",
+      "variant": "emphasis"
+    },
+    {
+      "id": "worker-to-estimates",
+      "from": "cv-worker",
+      "to": "estimates",
+      "label": "tulis count per kelas + waktu",
+      "variant": "emphasis",
+      "labelAt": [
+        833,
+        447
+      ]
+    },
+    {
+      "id": "estimates-to-server",
+      "from": "estimates",
+      "to": "static-server",
+      "label": "dibaca sebagai JSON statis",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "catalog-to-server",
+      "from": "catalog",
+      "to": "static-server",
+      "label": "katalog kamera",
+      "labelAt": [
+        833,
+        196
+      ]
+    },
+    {
+      "id": "server-to-dashboard",
+      "from": "static-server",
+      "to": "dashboard",
+      "label": "HTML / CSS / JS / JSON",
+      "variant": "emphasis",
+      "labelAt": [
+        1113,
+        202
+      ]
+    },
+    {
+      "id": "feed-to-dashboard",
+      "from": "public-feed",
+      "to": "dashboard",
+      "label": "HLS untuk pemutaran saja",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Komponen sekarang",
+      "items": [
+        "Peta CCTV, pemutar HLS, katalog kamera, dan server statis Node.js sudah ada.",
+        "Pemain CCTV tetap memutar feed pihak ketiga di browser."
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Tambahan MVP AI",
+      "items": [
+        "Worker lokal menjalankan NanoDet INT8 lewat OpenCV DNN pada CPU.",
+        "Mulai dari klip lokal yang izinnya jelas; UI membaca JSON agregat."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Batasan yang disengaja",
+      "items": [
+        "Tidak perlu GPU, training model, database server, atau API terpisah pada tahap awal.",
+        "Feed Bali Tower tidak dianalisis; simpan hitungan agregat saja, bukan video mentah."
+      ]
+    }
+  ]
+}

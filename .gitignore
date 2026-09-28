@@ -1,0 +1,5 @@
+.venv-ai/
+__pycache__/
+*.py[cod]
+ai/models/
+ai/traffic-estimates.json

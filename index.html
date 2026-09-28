@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101b21" />
+    <meta name="description" content="Jelajahi peta kamera publik Jakarta dan kenali prototipe analisis video AI ringan dari Ruang Pantau." />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="id_ID" />
+    <meta property="og:title" content="Ruang Pantau Jakarta — Lihat kota dari dekat" />
+    <meta property="og:description" content="Peta kamera publik Jakarta dengan prototipe analisis video AI yang ringan dan transparan." />
+    <meta property="og:image" content="https://images.unsplash.com/photo-1718729362445-51d2da1ee7a7?auto=format&fit=crop&w=1200&q=80" />
+    <title>Ruang Pantau Jakarta — Lihat kota dari dekat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link rel="stylesheet" href="./landing.css" />
+    <script src="./landing.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#konten">Lewati ke konten</a>
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="Ruang Pantau Jakarta, beranda">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none"><path d="M5 11.5h13.2l5 4.5-5 4.5H5v-9Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M23.2 16H27M8.5 9V7m6 2V7m-6 18v-2m6 2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="11.5" cy="16" r="2.2" fill="currentColor"/></svg>
+        </span>
+        <span class="brand-copy"><strong>RUANG PANTAU</strong><small>JAKARTA · CITY VIEW</small></span>
+      </a>
+      <nav class="main-nav" aria-label="Navigasi utama">
+        <a href="#fitur">Fitur</a>
+        <a href="#cara-kerja">Cara kerja</a>
+        <a href="#tentang">Tentang</a>
+      </nav>
+      <a class="header-cta" href="./dashboard.html">Buka dashboard <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <main id="konten">
+      <section class="hero" aria-labelledby="heroTitle">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-line"></span> PEMANTAUAN KOTA · JAKARTA</div>
+          <h1 id="heroTitle">Pahami ritme kota.<br /><em>Lihat titiknya.</em></h1>
+          <p class="hero-lede">Jelajahi kamera publik Jakarta dalam satu peta, buka sumber siaran, dan kenali bagaimana AI ringan membaca video lalu lintas.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="./dashboard.html">Jelajahi peta CCTV <span aria-hidden="true">↗</span></a>
+            <a class="button button-quiet" href="#cara-kerja"><span class="play-icon" aria-hidden="true">▶</span> Lihat cara kerja</a>
+          </div>
+          <div class="hero-footnote"><span class="tiny-pulse" aria-hidden="true"></span> Feed berasal dari penyedia pihak ketiga; status live dicek saat diputar.</div>
+        </div>
+
+        <div class="hero-visual" aria-label="Foto udara jalan dan gedung Jakarta pada malam hari">
+          <img class="hero-image" src="https://images.unsplash.com/photo-1718729362445-51d2da1ee7a7?auto=format&fit=crop&w=1900&q=85" alt="Simpang susun dan gedung-gedung Jakarta yang diterangi lampu malam" fetchpriority="high" />
+          <div class="visual-shade" aria-hidden="true"></div>
+          <div class="visual-topline"><span class="visual-live-dot" aria-hidden="true"></span><span>JAKARTA, INDONESIA</span><span class="visual-coordinate">06°12′ S · 106°49′ E</span></div>
+          <div class="map-orbit orbit-one" aria-hidden="true"></div>
+          <div class="map-orbit orbit-two" aria-hidden="true"></div>
+          <div class="map-pin pin-one" aria-hidden="true"><span></span></div>
+          <div class="map-pin pin-two" aria-hidden="true"><span></span></div>
+          <div class="map-pin pin-three" aria-hidden="true"><span></span></div>
+          <div class="camera-float">
+            <div class="camera-float-icon" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><path d="M2 6h10l4 4-4 4H2V6Z" stroke="currentColor" stroke-width="1.5"/><path d="M16 10h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="camera-float-copy"><small>KATALOG TERHUBUNG</small><strong><span data-camera-count>13</span> titik kamera</strong></div>
+            <span class="float-arrow" aria-hidden="true">↗</span>
+          </div>
+          <div class="ai-float"><span class="ai-spark" aria-hidden="true">✳</span><div><small>PROTOTIPE AI · CPU</small><strong>Analisis video offline</strong></div><span class="ai-tag">INT8</span></div>
+          <div class="visual-index"><span>01</span><span class="index-line"></span><span>PETA KOTA</span></div>
+        </div>
+      </section>
+
+      <section class="signal-row" aria-label="Ringkasan platform">
+        <div class="signal-intro"><span class="section-label">RUANG PANTAU DALAM ANGKA</span><p>Satu titik awal untuk menjelajahi kota.</p></div>
+        <div class="signal-stat"><strong><span data-camera-count>13</span></strong><span>Titik kamera di katalog</span></div>
+        <div class="signal-stat"><strong>5</strong><span>Wilayah Jakarta</span></div>
+        <div class="signal-stat"><strong>CPU</strong><span>Inferensi lokal yang ringan</span></div>
+        <div class="signal-availability"><span class="availability-icon" aria-hidden="true">↗</span><span>Siarkan dari sumber<br /><strong>jika tersedia</strong></span></div>
+      </section>
+
+      <section class="features-section section-wrap" id="fitur" aria-labelledby="featuresTitle">
+        <div class="section-heading">
+          <div><span class="section-label">DIBUAT UNTUK MENJELAJAHI</span><h2 id="featuresTitle">Sinyal kota, <em>lebih mudah dibaca.</em></h2></div>
+          <p>Fokus pada lokasi, akses sumber, dan insight yang bisa dijelaskan—tanpa menganggap setiap kamera selalu aktif.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card feature-map">
+            <div class="feature-art map-art" aria-hidden="true">
+              <div class="map-grid-lines"></div><span class="road road-a"></span><span class="road road-b"></span><span class="road road-c"></span>
+              <i class="map-dot dot-a"></i><i class="map-dot dot-b"></i><i class="map-dot dot-c"></i><i class="map-dot dot-d"></i><i class="map-dot dot-e"></i>
+              <span class="map-mini-label">JAKARTA</span>
+            </div>
+            <div class="feature-number">01 / PETA</div>
+            <h3>Mulai dari lokasi</h3>
+            <p>Temukan titik kamera di peta, cari nama area, lalu saring daftar berdasarkan wilayah.</p>
+          </article>
+          <article class="feature-card feature-source">
+            <div class="feature-art source-art">
+              <img src="https://images.unsplash.com/photo-1657869876752-077217620068?auto=format&fit=crop&w=1000&q=80" alt="Jalan utama Jakarta dengan kendaraan dan gedung perkantoran" loading="lazy" />
+              <div class="source-art-overlay"><span class="source-chip"><span></span> SUMBER PIHAK KETIGA</span><span class="source-art-mark" aria-hidden="true">↗</span></div>
+            </div>
+            <div class="feature-number">02 / SIARAN</div>
+            <h3>Buka sumber aslinya</h3>
+            <p>Player mencoba membuka feed publik. Label live hanya muncul ketika video benar-benar mulai diputar.</p>
+          </article>
+          <article class="feature-card feature-ai">
+            <div class="feature-art ai-art" aria-hidden="true">
+              <div class="ai-window-bar"><i></i><i></i><i></i><span>traffic_sample.mp4</span></div>
+              <div class="ai-frame"><div class="vehicle-box box-car"></div><div class="vehicle-box box-motor"></div><div class="vehicle-box box-bus"></div><span class="frame-corner corner-tl"></span><span class="frame-corner corner-br"></span></div>
+              <div class="ai-window-status"><span>●</span> CPU INFERENCE <strong>416 × 416</strong></div>
+            </div>
+            <div class="feature-number">03 / AI RINGAN</div>
+            <h3>Analisis dengan batas jelas</h3>
+            <p>Worker membaca klip lokal yang diizinkan dan merangkum deteksi. Belum menganalisis CCTV live.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="workflow-section" id="cara-kerja" aria-labelledby="workflowTitle">
+        <div class="section-wrap workflow-wrap">
+          <div class="workflow-copy">
+            <span class="section-label section-label-light">ALUR SEDERHANA</span>
+            <h2 id="workflowTitle">Dari titik kota<br /><em>ke insight.</em></h2>
+            <p>Dashboard dan AI punya tugas yang terpisah. Siaran tetap datang dari provider, sementara worker hanya memproses video lokal yang kamu izinkan.</p>
+            <a class="text-link" href="./dashboard.html">Buka dashboard <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="workflow-steps">
+            <article class="workflow-step"><span class="step-count">01</span><div class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="10" r="2.2" stroke="currentColor" stroke-width="1.5"/></svg></div><div><h3>Pilih titik</h3><p>Gunakan peta dan katalog untuk menentukan lokasi.</p></div><span class="step-state">DASHBOARD</span></article>
+            <article class="workflow-step"><span class="step-count">02</span><div class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3 6.5h12l5 5.5-5 5.5H3v-11Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="m9 9 5 3-5 3V9Z" fill="currentColor"/></svg></div><div><h3>Coba siaran</h3><p>Feed berasal dari provider publik dan dapat berubah atau offline.</p></div><span class="step-state step-third-party">PIHAK KETIGA</span></article>
+            <article class="workflow-step"><span class="step-count">03</span><div class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v14H4zM8 9h3v3H8zM14 9h3v3h-3zM8 15h3m3 0h3" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div><div><h3>Jalankan analisis AI</h3><p>Proses klip berizin secara lokal; hasilnya agregat dan bukan status live.</p></div><span class="step-state step-offline">OFFLINE</span></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta-section section-wrap" id="tentang">
+        <div class="cta-panel">
+          <div class="cta-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M5 11.5h13.2l5 4.5-5 4.5H5v-9Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M23.2 16H27M8.5 9V7m6 2V7m-6 18v-2m6 2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="11.5" cy="16" r="2.2" fill="currentColor"/></svg></div>
+          <div class="cta-copy"><span class="section-label">RUANG PANTAU JAKARTA</span><h2>Kota terasa dekat<br />ketika terlihat jelas.</h2><p>Mulai jelajahi lokasi kamera dan lihat sumber yang tersedia hari ini.</p></div>
+          <a class="button button-primary" href="./dashboard.html">Masuk ke peta <span aria-hidden="true">↗</span></a>
+          <div class="cta-graphic" aria-hidden="true"><span class="cta-orbit cta-orbit-a"></span><span class="cta-orbit cta-orbit-b"></span><i></i><i></i><i></i></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a class="footer-brand" href="./"><span class="footer-dot" aria-hidden="true"></span> RUANG PANTAU <small>JAKARTA</small></a>
+      <p>Eksplorasi independen. Feed disediakan pihak ketiga; ketersediaan mengikuti sumber kamera.</p>
+      <div class="footer-links"><a href="./dashboard.html">Dashboard</a><a href="https://jakcctv.jakarta.go.id/publik" target="_blank" rel="noopener noreferrer">Portal publik <span aria-hidden="true">↗</span></a></div>
+    </footer>
+  </body>
+</html>

@@ -50,23 +50,24 @@ Edit array kamera di `cameras.json`. Setiap entri memakai skema berikut:
     "lng": 106.8003,
     "url": "https://cctv.balitower.co.id/contoh/embed.html",
     "provider": "Bali Tower",
-    "feedType": "hls-derived"
+    "feedType": "provider-embed"
   }
 ]
 ```
 
-`id` harus unik dan stabil karena digunakan untuk marker, pilihan kamera, dan favorit. `name`, `view`, `area`, `district`, `lat`, `lng`, dan `url` menjelaskan lokasi serta sumber feed. `provider` adalah nama penyedia feed, sedangkan `feedType` menjelaskan cara aplikasi mencoba memutarnya; nilai `hls-derived` berarti aplikasi membentuk URL manifest HLS dari URL embed Bali Tower. Jangan simpan status siaran dinamis di katalog.
+`id` harus unik dan stabil karena digunakan untuk marker, pilihan kamera, dan favorit. `name`, `view`, `area`, `district`, `lat`, `lng`, dan `url` menjelaskan lokasi serta sumber feed. `provider` adalah nama penyedia feed, sedangkan `feedType` menjelaskan cara aplikasi mencoba memutarnya. Gunakan `provider-embed` untuk URL player yang diterbitkan provider. Jenis `hls` hanya boleh dipakai jika `streamUrl` manifest HTTPS memang diberikan atau dikonfirmasi oleh provider. Jangan membentuk URL manifest dengan menebak path embed dan jangan simpan status siaran dinamis di katalog.
 
 Pastikan `url` adalah URL absolut HTTPS, nama wilayah cocok dengan label filter, dan koordinatnya benar sebelum menyimpan. Koordinat katalog saat ini bersifat perkiraan; verifikasi setiap titik di peta. Setelah menambahkan wilayah baru, periksa juga tombol filter di `index.html` karena daftar wilayah filter ditulis terpisah dari katalog.
 
 ## Cara pemutar memilih sumber
 
-- Untuk URL pada host persis `cctv.balitower.co.id`, aplikasi menambahkan `proto=hls` ke URL sumber bila parameter itu belum ada. Pemutar kemudian membentuk URL manifest dengan mengganti akhiran `/embed.html` menjadi `/index.fmp4.m3u8`.
-- Manifest Bali Tower diputar memakai hls.js jika tersedia, atau pemutar HLS native browser (misalnya Safari) sebagai fallback. Autoplay dapat ditolak browser; video dibuat muted dan kontrol putar tersedia.
-- Host lain dibuka sebagai halaman di dalam `iframe`. Aplikasi tidak mengonversi URL pihak lain menjadi HLS dan tidak dapat melewati larangan embed, autentikasi, CORS, atau pembatasan akses penyedia.
-- Setiap sesi pemutar dimulai dengan status belum diverifikasi/menghubungkan. Status `LIVE · TERHUBUNG` hanya muncul setelah elemen video memancarkan event `playing`; ini berarti video mulai berjalan pada sesi tersebut, bukan pemeriksaan kesehatan provider secara umum.
+- Kamera katalog Bali Tower dibuka dari URL embed HTTPS yang diterbitkan provider. Aplikasi tidak menambahkan `proto=hls` dan tidak menebak URL manifest. Pada pemeriksaan 29 September 2026, halaman embed Bendungan Hilir tampil dengan timestamp berjalan saat dibuka langsung, sedangkan manifest turunan `/index.fmp4.m3u8` membalas 404. Di browser in-app, halaman yang sama belum selesai dimuat ketika ditanam sebagai iframe lokal; gunakan **Buka sumber asli** bila embed tertahan.
+- Manifest lama `index.m3u8` memang merespons, tetapi playlist yang diperiksa hanya memuat dua segmen dengan waktu program 28 September 2026. Karena tidak mencerminkan siaran saat itu, aplikasi tidak menggunakannya sebagai live feed.
+- Feed HLS hanya memakai hls.js atau pemutar HLS native browser jika katalog memuat `feedType: "hls"` dan `streamUrl` HTTPS yang sudah diverifikasi. Jika HLS gagal atau browser tidak mendukungnya, player mencoba embed sumber yang sama.
+- Embed pihak ketiga ditampilkan di dalam `iframe`. Event `load` hanya menandakan halaman embed terbuka, bukan bukti video sedang live. Karena browser membatasi pembacaan konten lintas origin, status tetap `EMBED DIMUAT · LIVE BELUM DIVERIFIKASI`; periksa gambar/timestamp provider atau buka sumber asli.
+- Aplikasi tidak dapat melewati larangan embed, autentikasi, CORS, atau pembatasan akses penyedia.
 - Status koneksi, buffering, terputus, atau gagal adalah status sesi di browser untuk kamera yang sedang dipilih. Status tersebut tidak disimpan ke `cameras.json` dan tidak mewakili riwayat maupun kesehatan semua feed dari provider. Aplikasi tidak menjalankan probe terjadwal atau menyimpan hasil pemeriksaan provider.
-- Filter **Terputar sesi ini**, **Belum dicek**, dan **Gagal sesi ini** memfilter berdasarkan hasil pemutaran selama tab masih terbuka. Label terputar berarti video pernah berjalan pada sesi tab ini; kegagalan hanya mencatat percobaan pemutaran di sesi, bukan status provider. Semua kamera kembali berstatus belum diverifikasi saat halaman dimuat ulang.
+- Filter **Terputar sesi ini**, **Belum dicek**, dan **Gagal sesi ini** memfilter berdasarkan hasil pemutaran selama tab masih terbuka. Hanya event video `playing` yang menandai kamera terputar; iframe embed tetap belum diverifikasi karena aplikasinya tidak dapat membaca status internal player. Semua kamera kembali berstatus belum diverifikasi saat halaman dimuat ulang.
 - Tombol besarkan pemutar meminta mode layar penuh browser; jika tidak tersedia atau ditolak, player diperbesar di dalam area peta. `Escape` keluar dari tampilan besar sebelum menutup panel.
 - Tautan **Buka sumber asli** membuka URL embed kamera. Tombol **Portal CCTV resmi** menuju <https://jakcctv.jakarta.go.id/publik>.
 
@@ -80,8 +81,8 @@ Lakukan pemeriksaan berikut di browser yang akan didukung. Catat tanggal dan has
 2. Pastikan basemap dan atribusi terlihat, jumlah kamera sesuai katalog, marker berada di sekitar lokasi yang dimaksud, dan kontrol zoom berfungsi.
 3. Coba pencarian nama lokasi/wilayah, setiap filter wilayah, tombol Atur ulang, favorit, dan muat ulang halaman untuk memastikan favorit tersimpan.
 4. Pilih kamera dari daftar dan marker peta. Pastikan judul, lokasi, status, dan tautan sumber berubah sesuai kamera; tutup player lalu pilih kamera lain.
-5. Coba setidaknya satu feed Bali Tower HLS. Jika katalog kelak berisi jenis feed iframe, coba juga satu feed iframe. Tunggu hingga status berubah; pastikan pemutar menampilkan kegagalan atau buffering dengan pesan yang dapat dipahami saat feed tidak merespons. Klik **Buka sumber asli** untuk membandingkan perilaku sumber.
-6. Pilih beberapa kamera dan pastikan masing-masing sesi dimulai sebagai belum diverifikasi; status live baru tampil setelah event `playing`. Pastikan buffering dan error tidak tercatat sebagai status provider yang persisten.
+5. Coba feed embed Bendungan Hilir dan beberapa lokasi lain. Status embed tidak boleh berubah menjadi `LIVE` hanya karena iframe selesai dimuat. Klik **Buka sumber asli** untuk membandingkan perilaku sumber.
+6. Jika katalog kelak memakai HLS terverifikasi, pastikan status live baru tampil setelah event `playing`; kegagalan HLS harus mencoba embed provider bila tersedia.
 7. Uji navigasi keyboard, fokus yang terlihat, tombol `/` untuk pencarian, `Escape` untuk menutup player, dan status yang diumumkan teknologi bantu.
 8. Periksa tampilan desktop dan ponsel: daftar kamera dapat digulir, panel player tidak menutupi kontrol peta, dan kontrol tetap dapat dipakai pada ukuran layar sempit.
 9. Simulasikan koneksi terputus atau blokir host pihak ketiga. Pastikan kegagalan tidak merusak daftar/pencarian dan tidak ada label kamera yang menyiratkan semua feed aktif.

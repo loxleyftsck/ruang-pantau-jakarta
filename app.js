@@ -384,18 +384,26 @@ function selectCamera(id, options = {}) {
 }
 
 function getFeedUrl(camera) {
-  const url = new URL(camera.url);
-  if (camera.provider === 'Bali Tower' && camera.feedType === 'hls-derived' && url.hostname === 'cctv.balitower.co.id' && !url.searchParams.has('proto')) url.searchParams.set('proto', 'hls');
-  return url.toString();
+  try {
+    const url = new URL(camera.url);
+    if (url.protocol !== 'https:') return null;
+    // Use Bali Tower's public embed as published. Avoid forcing its undocumented
+    // HLS mode; the derived manifest for the tested camera returned 404.
+    if (camera.provider === 'Bali Tower' && url.hostname === 'cctv.balitower.co.id') url.searchParams.delete('proto');
+    return url.toString();
+  } catch {
+    return null;
+  }
 }
 
 function getHlsUrl(camera) {
-  const url = new URL(camera.url);
-  if (camera.provider !== 'Bali Tower' || camera.feedType !== 'hls-derived' || url.hostname !== 'cctv.balitower.co.id') return null;
-  url.pathname = url.pathname.replace(/\/embed\.html$/, '/index.fmp4.m3u8');
-  url.search = '';
-  url.hash = '';
-  return url.toString();
+  if (camera.feedType !== 'hls' || !camera.streamUrl) return null;
+  try {
+    const url = new URL(camera.streamUrl);
+    return url.protocol === 'https:' ? url.toString() : null;
+  } catch {
+    return null;
+  }
 }
 
 function stopActivePlayer() {
@@ -432,6 +440,38 @@ function hidePlayerMessage() {
   if (message) message.hidden = true;
 }
 
+function startProviderEmbed(camera, feedUrl) {
+  const session = ++playerSession;
+  const isCurrentSession = () => session === playerSession;
+  playerFrame.innerHTML = `<iframe title="Siaran CCTV ${escapeHtml(camera.name)}" src="${escapeHtml(feedUrl)}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><div class="player-feedback" id="playerFeedback" role="status"><span class="feedback-spinner" aria-hidden="true"></span><span>Membuka pemutar CCTV dari sumber…</span></div>`;
+  const frame = playerFrame.querySelector('iframe');
+
+  frame.addEventListener('load', () => {
+    if (!isCurrentSession()) return;
+    window.clearTimeout(playerStartTimer);
+    playerStartTimer = null;
+    setCameraHealth(camera.id, 'unknown');
+    setPlayerStatus('EMBED DIMUAT · LIVE BELUM DIVERIFIKASI');
+    hidePlayerMessage();
+  }, { once: true });
+  frame.addEventListener('error', () => {
+    if (!isCurrentSession()) return;
+    window.clearTimeout(playerStartTimer);
+    playerStartTimer = null;
+    setCameraHealth(camera.id, 'error');
+    setPlayerStatus('EMBED GAGAL DIMUAT', 'error');
+    showPlayerMessage('Sumber tidak dapat dimuat. Coba buka sumber asli.', true);
+  }, { once: true });
+
+  playerStartTimer = window.setTimeout(() => {
+    playerStartTimer = null;
+    if (!isCurrentSession()) return;
+    setCameraHealth(camera.id, 'unknown');
+    setPlayerStatus('EMBED BELUM TERKONFIRMASI');
+    showPlayerMessage('Browser belum mengonfirmasi embed. Feed mungkin tetap tersedia di provider; buka sumber asli.');
+  }, 20_000);
+}
+
 function startHlsPlayer(camera, streamUrl) {
   const video = document.getElementById('cameraVideo');
   if (!video) return;
@@ -445,6 +485,18 @@ function startHlsPlayer(camera, streamUrl) {
     setCameraHealth(camera.id, 'error');
     setPlayerStatus(status, 'error');
     showPlayerMessage(message, true);
+  };
+  const fallbackToProviderEmbed = () => {
+    if (!isCurrentSession()) return;
+    const feedUrl = getFeedUrl(camera);
+    if (!feedUrl) {
+      failPlayer('Tidak ada sumber embed yang dapat dibuka.');
+      return;
+    }
+    stopActivePlayer();
+    setCameraHealth(camera.id, 'connecting');
+    setPlayerStatus('BERALIH KE EMBED SUMBER', 'connecting');
+    startProviderEmbed(camera, feedUrl);
   };
 
   const onPlaying = () => {
@@ -465,7 +517,7 @@ function startHlsPlayer(camera, streamUrl) {
       setPlayerStatus('LIVE · BUFFERING');
       window.clearTimeout(playerStallTimer);
       playerStallTimer = window.setTimeout(() => {
-        failPlayer('Siaran berhenti menerima gambar. Coba buka sumber langsung atau pilih kamera lain.', 'SIARAN TERPUTUS');
+        fallbackToProviderEmbed();
       }, 20_000);
     } else {
       setCameraHealth(camera.id, 'connecting');
@@ -473,9 +525,7 @@ function startHlsPlayer(camera, streamUrl) {
       showPlayerMessage('Menghubungkan ke siaran langsung…');
     }
   };
-  const onError = () => {
-    failPlayer(`Feed ${camera.name} tidak merespons. Coba buka sumber langsung.`);
-  };
+  const onError = () => fallbackToProviderEmbed();
   const promptPlayback = () => {
     if (!isCurrentSession()) return;
     setCameraHealth(camera.id, 'unknown');
@@ -502,7 +552,7 @@ function startHlsPlayer(camera, streamUrl) {
       promptPlayback();
       return;
     }
-    failPlayer('Belum ada gambar dari kamera. Coba buka sumber langsung atau pilih kamera lain.', 'SIARAN BELUM MERESPONS');
+    fallbackToProviderEmbed();
   }, 20_000);
 
   if (window.Hls && window.Hls.isSupported()) {
@@ -518,7 +568,7 @@ function startHlsPlayer(camera, streamUrl) {
     hls.on(window.Hls.Events.ERROR, (_event, data) => {
       if (!data.fatal || !isCurrentSession()) return;
       console.warn('CCTV HLS playback error', { type: data.type, details: data.details, responseCode: data.response?.code, reason: data.reason });
-      failPlayer('Feed ini gagal dimuat. Kamera mungkin offline atau aksesnya terbatas.');
+      fallbackToProviderEmbed();
     });
     hls.attachMedia(video);
     return;
@@ -529,10 +579,7 @@ function startHlsPlayer(camera, streamUrl) {
     video.play().catch(promptPlayback);
     return;
   }
-  stopActivePlayer();
-  setCameraHealth(camera.id, 'error');
-  setPlayerStatus('PEMUTAR TIDAK DIDUKUNG', 'error');
-  showPlayerMessage('Browser ini belum mendukung pemutaran HLS. Buka sumber langsung.', true);
+  fallbackToProviderEmbed();
 }
 
 function showPlayer(camera) {
@@ -546,6 +593,12 @@ function showPlayer(camera) {
   playerArea.textContent = `${camera.area} · Kecamatan ${camera.district} · ${camera.view}`;
   renderTrafficEstimates(camera.id);
   const feedUrl = getFeedUrl(camera);
+  if (!feedUrl) {
+    setCameraHealth(camera.id, 'error');
+    setPlayerStatus('SUMBER TIDAK VALID', 'error');
+    playerFrame.innerHTML = '<div class="player-unavailable"><strong>Sumber CCTV tidak valid</strong><span>Periksa kembali URL sumber pada katalog kamera.</span></div>';
+    return;
+  }
   openSource.href = feedUrl;
   openSource.textContent = 'Buka sumber asli ↗';
   setCameraHealth(camera.id, 'connecting');
@@ -558,10 +611,8 @@ function showPlayer(camera) {
     return;
   }
 
-  // A cross-origin embed's load event cannot confirm that video is actually playing.
-  setCameraHealth(camera.id, 'unknown');
-  setPlayerStatus('STATUS SIARAN BELUM DIVERIFIKASI', 'unknown');
-  playerFrame.innerHTML = `<iframe title="Siaran CCTV ${escapeHtml(camera.name)}" src="${escapeHtml(feedUrl)}" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+  // A cross-origin embed can display live video, but its load event cannot prove playback.
+  startProviderEmbed(camera, feedUrl);
 }
 
 function closePlayer() {
